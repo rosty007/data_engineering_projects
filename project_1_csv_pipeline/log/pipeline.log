@@ -1,0 +1,22 @@
+2026-10-07 05:32:20,757 - INFO - Starting ETL pipeline
+2026-10-07 05:32:20,758 - INFO - Extracting data from ../data/sales_data.csv
+2026-10-07 05:35:56,904 - INFO - Starting ETL pipeline
+2026-10-07 05:35:56,905 - INFO - Extracting data from /mnt/d/Backup/projects/data_engineering_projects/project_1_csv_pipeline/data/sales_data.csv
+2026-10-07 05:35:57,101 - INFO - Extracted 5 rows successfully from /mnt/d/Backup/projects/data_engineering_projects/project_1_csv_pipeline/data/sales_data.csv
+2026-10-07 05:35:57,102 - INFO - Transforming data
+2026-10-07 05:35:57,342 - INFO - Data transformed successfully
+2026-10-07 05:35:57,342 - INFO - Loading data into the database
+2026-10-07 05:38:41,632 - INFO - Starting ETL pipeline
+2026-10-07 05:38:41,633 - INFO - Extracting data from /mnt/d/Backup/projects/data_engineering_projects/project_1_csv_pipeline/data/sales_data.csv
+2026-10-07 05:38:41,833 - INFO - Extracted 5 rows successfully from /mnt/d/Backup/projects/data_engineering_projects/project_1_csv_pipeline/data/sales_data.csv
+2026-10-07 05:38:41,833 - INFO - Transforming data
+2026-10-07 05:38:42,035 - INFO - Data transformed successfully
+2026-10-07 05:38:42,036 - INFO - Loading data into the database
+2026-10-07 05:39:48,709 - INFO - Starting ETL pipeline
+2026-10-07 05:39:48,710 - INFO - Extracting data from /mnt/d/Backup/projects/data_engineering_projects/project_1_csv_pipeline/data/sales_data.csv
+2026-10-07 05:39:48,874 - INFO - Extracted 5 rows successfully from /mnt/d/Backup/projects/data_engineering_projects/project_1_csv_pipeline/data/sales_data.csv
+2026-10-07 05:39:48,875 - INFO - Transforming data
+2026-10-07 05:39:49,055 - INFO - Data transformed successfully
+2026-10-07 05:39:49,056 - INFO - Loading data into the database
+2026-10-07 05:39:51,023 - INFO - Loaded 4 rows into the database successfully
+2026-10-07 05:39:51,024 - INFO - ETL pipeline completed successfully
