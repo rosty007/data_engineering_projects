@@ -79,8 +79,8 @@ def load_data(df: pd.DataFrame, connection_string: str) -> None:
     logger.info("Loading data into the database")
     # Create a database connection using SQLAlchemy based on the provided connection string
     db_connection = create_engine(connection_string)
-    # Load the DataFrame into the 'sales' table in the database, appending if it already exists
-    df.to_sql('sales', db_connection, if_exists='append', index=False)
+    # Load the DataFrame into the 'sales' table in the database, replacing if it already exists
+    df.to_sql('sales', db_connection, if_exists='replace', index=False)
     logger.info(f"Loaded {len(df)} rows into the database successfully")
 
 

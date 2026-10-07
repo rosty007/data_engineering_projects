@@ -62,36 +62,25 @@ CSV file  ──►  Extract  ──►  Transform  ──►  Load  ──►  
 3. **Parse dates**: the `order_date` column is converted to a real datetime type. Values that cannot be parsed become `NaT` (null) instead of stopping the pipeline.
 
 ### 3. Load
-`load_data()` creates a SQLAlchemy engine from the connection string and **appends** the DataFrame to the existing `sales` table. The table must be created beforehand (see [Database Schema](#database-schema)), and its constraints (such as the primary key on `order_id`) are enforced by PostgreSQL during the load.
+`load_data()` creates a SQLAlchemy engine from the connection string and writes the DataFrame to the `sales` table with `if_exists='replace'`. On every run, the existing table (if any) is **dropped and recreated** with the cleaned data, so the table always mirrors the latest CSV file. Column types are inferred by pandas (see [Database Schema](#database-schema)).
 
 ### Orchestration and logging
 `run_pipeline()` runs the three steps in order. Every stage writes timestamped messages to `log/pipeline.log`.
 
 ## Database Schema
 
-The target table is created manually in PostgreSQL before running the pipeline:
+The `sales` table is created by the pipeline itself, so there is nothing to set up manually. The CSV file is expected to contain these columns:
 
-```sql
-CREATE TABLE sales (
-    order_id      INT PRIMARY KEY,
-    customer_name TEXT,
-    product       TEXT,
-    quantity      INT,
-    amount        FLOAT,
-    order_date    DATE
-);
-```
-
-| Column | Type | Description |
+| Column | Description | Type created in PostgreSQL (inferred) |
 |---|---|---|
-| `order_id` | INT (primary key) | Unique identifier of the order |
-| `customer_name` | TEXT | Name of the customer |
-| `product` | TEXT | Product purchased |
-| `quantity` | INT | Number of units ordered |
-| `amount` | FLOAT | Order amount (missing values are set to `0` by the pipeline) |
-| `order_date` | DATE | Date of the order |
+| `order_id` | Unique identifier of the order | `BIGINT` |
+| `customer_name` | Name of the customer | `TEXT` |
+| `product` | Product purchased | `TEXT` |
+| `quantity` | Number of units ordered | `BIGINT` |
+| `amount` | Order amount (missing values are set to `0`) | `DOUBLE PRECISION` |
+| `order_date` | Date of the order | `TIMESTAMP` |
 
-The CSV file must have columns with these same names, since `to_sql` maps DataFrame columns to table columns by name.
+> **Important:** because the load uses `if_exists='replace'`, any table created manually beforehand is dropped and replaced. Constraints such as a primary key on `order_id` are **not** preserved, and `order_date` is stored as a `TIMESTAMP` (with a `00:00:00` time) rather than a `DATE`. If you need a strict schema, create the table yourself, switch the load to `if_exists='append'` and truncate the table before each run.
 
 ## How to Run
 
@@ -99,8 +88,7 @@ The CSV file must have columns with these same names, since `to_sql` maps DataFr
 
 - Python 3.9 or later
 - A running PostgreSQL server and an existing database
-- The `sales` table, created beforehand (see [Database Schema](#database-schema))
-- A PostgreSQL user with permission to insert rows into that table
+- A PostgreSQL user with permission to create and drop tables in that database (the pipeline recreates the `sales` table on every run)
 
 ### 1. Get the project
 
@@ -155,9 +143,9 @@ DB_NAME=your_db_name
 
 > **Security:** never commit `config/.env` to version control. Add it to your `.gitignore`.
 
-### 5. Create the table and place your input data
+### 5. Place your input data
 
-Run the `CREATE TABLE` statement from the [Database Schema](#database-schema) section in your database (with `psql` or any SQL client). Then make sure your CSV file is in the `data/` folder, with the columns `order_id`, `customer_name`, `product`, `quantity`, `amount` and `order_date`.
+Make sure your CSV file is in the `data/` folder, with the columns `order_id`, `customer_name`, `product`, `quantity`, `amount` and `order_date`. The `sales` table does not need to exist: the pipeline creates it.
 
 ### 6. Run the pipeline
 
@@ -219,19 +207,21 @@ SELECT * FROM sales LIMIT 3;
 ```
 
 ```text
- order_id | customer_name |   product   | quantity | amount | order_date
-----------+---------------+-------------+----------+--------+------------
-        1 | Alice Martin  | Laptop      |        1 |   899.0 | 2026-01-05
-        2 | Bob Dupont    | Mouse       |        2 |    35.5 | 2026-01-06
-        3 | Chloe Bernard | Keyboard    |        1 |       0 | 2026-01-07
+ order_id | customer_name |  product  | quantity | amount |     order_date
+----------+---------------+-----------+----------+--------+---------------------
+        1 | Alice Martin  | Laptop    |        1 |  899.0 | 2026-01-05 00:00:00
+        2 | Bob Dupont    | Mouse     |        2 |   35.5 | 2026-01-06 00:00:00
+        3 | Chloe Bernard | Keyboard  |        1 |      0 | 2026-01-07 00:00:00
 ```
 
 ## Notes and Limitations
 
-- **Re-running fails on the same data.** The load step appends rows, and `order_id` is a primary key. Running the pipeline a second time on the same file raises a unique-constraint violation instead of creating duplicates. To reload, run `TRUNCATE TABLE sales;` first, or add an upsert (`INSERT ... ON CONFLICT`) step to make the pipeline idempotent.
-- **Duplicate `order_id` values in the CSV.** `drop_duplicates()` only removes rows that are identical in every column. Two different rows sharing the same `order_id` will make the load fail on the primary key.
-- **Minimal validation.** The pipeline assumes the CSV columns match the table, and the transform step expects `amount` and `order_date`. A missing column or a type mismatch raises an error visible in the console.
-- **Missing dates.** Unparseable dates become null (`NaT`) and are loaded as `NULL`, which the schema allows because `order_date` is not declared `NOT NULL`.
+- **Full refresh on every run.** The load step replaces the table, so running the pipeline twice on the same file is safe and produces the same result (no duplicates). The flip side is that **all previous data is deleted** on each run: this approach is not suitable for incremental loads or for keeping history.
+- **No constraints or indexes.** The recreated table has no primary key, indexes or `NOT NULL` constraints, so duplicate `order_id` values in the CSV are loaded as they are. `drop_duplicates()` only removes rows that are identical in every column.
+- **Inferred types.** Column types come from pandas (see [Database Schema](#database-schema)). For production use, define the schema explicitly.
+- **Dependent objects.** Dropping the table also drops anything that depends on it (views, foreign keys, grants), which can break downstream reports.
+- **Minimal validation.** The transform step expects the columns `amount` and `order_date`. A missing column raises an error visible in the console.
+- **Missing dates.** Unparseable dates become null (`NaT`) and are loaded as `NULL`.
 
 ## Key Learnings
 
@@ -240,7 +230,7 @@ This project demonstrates the following skills and concepts:
 - **ETL design:** separating extraction, transformation and loading into small, testable functions.
 - **Data cleaning with pandas:** deduplication, handling missing values, type conversion with graceful error handling (`errors='coerce'`).
 - **Database integration:** connecting Python to PostgreSQL with SQLAlchemy and loading data with `to_sql`.
-- **Data modeling:** defining a relational schema with explicit column types and a primary key to guarantee data integrity.
+- **Load strategies:** understanding the trade-off between `replace` (simple, idempotent full refresh) and `append` (incremental, but needs deduplication), and how each affects the table schema.
 - **Configuration management:** keeping credentials out of the code with environment variables and `python-dotenv`, and URL-encoding credentials safely.
 - **Logging:** building an audit trail with Python's `logging` module.
 - **Project hygiene:** a clear folder structure, a Python virtual environment, a `requirements.txt` for reproducibility, and documented code (docstrings and type hints).
@@ -249,7 +239,7 @@ This project demonstrates the following skills and concepts:
 ## Possible Improvements
 
 - Add data-quality checks (schema validation, row-count checks).
-- Make loads idempotent (upsert with `ON CONFLICT`, or truncate-and-load).
+- Define the table schema explicitly (primary key, `DATE` type) and switch to an upsert (`ON CONFLICT`) or truncate-and-append load.
 - Add error handling and retries around the database connection.
 - Add unit tests for `transform_data()` with `pytest`.
 - Schedule the pipeline (cron or Airflow) and containerize it with Docker.
