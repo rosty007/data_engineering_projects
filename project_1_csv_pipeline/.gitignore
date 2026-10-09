@@ -1,0 +1,6 @@
+de_venv
+venv
+log
+config/.env
+config
+.env*
