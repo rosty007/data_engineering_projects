@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 
 import pandas as pd
@@ -8,6 +9,9 @@ logger = logging.getLogger(__name__)
 log_dir = pathlib.Path(__file__).parent.parent / "logs"
 data_dir = pathlib.Path(__file__).parent.parent / "data"
 log_file = log_dir / "data_cleaning_pipeline.log"
+
+os.makedirs(log_dir, exist_ok=True)
+os.makedirs(data_dir, exist_ok=True)
 
 logging.basicConfig(
     filename=log_file,
