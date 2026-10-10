@@ -32,3 +32,7 @@ LINE 1: ...ture, windspeed, winddirection, observation_time, latitude, ...
 2026-10-07 10:13:38,506 - INFO - Successfully transformed data into DataFrame
 2026-10-07 10:13:40,344 - INFO - Successfully loaded data into the database
 2026-10-07 10:13:40,344 - INFO - ETL pipeline completed successfully
+2026-10-07 10:52:01,688 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 10:52:01,972 - INFO - Successfully transformed data into DataFrame
+2026-10-07 10:52:04,256 - INFO - Successfully loaded data into the database
+2026-10-07 10:52:04,257 - INFO - ETL pipeline completed successfully
