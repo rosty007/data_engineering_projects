@@ -1,0 +1,38 @@
+2026-10-07 09:43:19,714 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 09:43:19,766 - ERROR - An error occurred during data transformation: If using all scalar values, you must pass an index
+2026-10-07 09:43:19,766 - ERROR - ETL pipeline failed: 
+2026-10-07 09:49:42,637 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 09:49:42,684 - ERROR - An error occurred during data transformation: If using all scalar values, you must pass an index, {'time': '2026-10-09T09:15', 'interval': 900, 'temperature': 12.4, 'windspeed': 15.8, 'winddirection': 243, 'is_day': 1, 'weathercode': 3}
+2026-10-07 09:49:42,686 - ERROR - ETL pipeline failed: 
+2026-10-07 09:53:44,698 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 09:53:44,749 - INFO - Successfully transformed data into DataFrame
+2026-10-07 09:53:46,597 - INFO - Successfully loaded data into the database
+2026-10-07 09:53:46,598 - INFO - ETL pipeline completed successfully
+2026-10-07 09:57:31,826 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 09:57:31,879 - INFO - Successfully transformed data into DataFrame
+2026-10-07 09:57:35,872 - INFO - Successfully loaded data into the database
+2026-10-07 09:57:35,874 - INFO - ETL pipeline completed successfully
+2026-10-07 09:59:27,544 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 09:59:27,801 - INFO - Successfully transformed data into DataFrame
+2026-10-07 09:59:29,556 - INFO - Successfully loaded data into the database
+2026-10-07 09:59:29,557 - INFO - ETL pipeline completed successfully
+2026-10-07 10:07:05,119 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 10:07:05,442 - INFO - Successfully transformed data into DataFrame
+2026-10-07 10:07:07,140 - ERROR - An error occurred while loading data into the database: Execution failed on sql 'INSERT INTO weather_data (temperature, windspeed, winddirection, observation_time, latitude, longitude) VALUES (:temperature, :windspeed, :winddirection, :observation_time, :latitude, :longitude)': (psycopg.errors.UndefinedColumn) column "latitude" of relation "weather_data" does not exist
+LINE 1: ...ture, windspeed, winddirection, observation_time, latitude, ...
+                                                             ^
+[SQL: INSERT INTO weather_data (temperature, windspeed, winddirection, observation_time, latitude, longitude) VALUES (%(temperature)s, %(windspeed)s, %(winddirection)s::BIGINT, %(observation_time)s::TIMESTAMP WITHOUT TIME ZONE, %(latitude)s, %(longitude)s)]
+[parameters: {'temperature': 12.7, 'windspeed': 16.6, 'winddirection': 246, 'observation_time': datetime.datetime(2026, 10, 9, 9, 30), 'latitude': 52.512604, 'longitude': 13.419517}]
+(Background on this error at: https://sqlalche.me/e/21/f405)
+2026-10-07 10:09:29,253 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 10:09:29,521 - INFO - Successfully transformed data into DataFrame
+2026-10-07 10:09:31,502 - INFO - Successfully loaded data into the database
+2026-10-07 10:09:31,503 - INFO - ETL pipeline completed successfully
+2026-10-07 10:13:38,290 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 10:13:38,506 - INFO - Successfully transformed data into DataFrame
+2026-10-07 10:13:40,344 - INFO - Successfully loaded data into the database
+2026-10-07 10:13:40,344 - INFO - ETL pipeline completed successfully
+2026-10-07 10:52:01,688 - INFO - Successfully extracted data from https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current_weather=true
+2026-10-07 10:52:01,972 - INFO - Successfully transformed data into DataFrame
+2026-10-07 10:52:04,256 - INFO - Successfully loaded data into the database
+2026-10-07 10:52:04,257 - INFO - ETL pipeline completed successfully

@@ -1,2 +1,8 @@
 de_venv
+venv
+log
+logs
+config/.env
+config
 .env*
+data
